@@ -20,6 +20,19 @@ interface CreatePlanModalProps {
   merchantWallet: string;
 }
 
+// Generate a unique plan ID
+const generatePlanId = (planName: string): string => {
+  const timestamp = Date.now();
+  const random = Math.random().toString(36).substring(2, 8);
+  const cleanName = planName
+    .toLowerCase()
+    .replace(/[^a-z0-9]/g, '-')
+    .replace(/-+/g, '-')
+    .substring(0, 16);
+  
+  return `${cleanName}-${timestamp}-${random}`;
+};
+
 export default function CreatePlanModal({ 
   isOpen, 
   onClose, 
@@ -28,7 +41,6 @@ export default function CreatePlanModal({
 }: CreatePlanModalProps) {
   const [formData, setFormData] = useState({
     planName: '',
-    planId: '',
     feeAmount: '',
     paymentInterval: '30',
     description: '',
@@ -39,7 +51,7 @@ export default function CreatePlanModal({
   const { signAndSendTransaction } = useSignAndSendTransaction();
 
   const handleCreatePlan = async () => {
-    if (!formData.planName || !formData.planId || !formData.feeAmount) {
+    if (!formData.planName || !formData.feeAmount) {
       showErrorToast('Please fill in all required fields');
       return;
     }
@@ -54,6 +66,9 @@ export default function CreatePlanModal({
     try {
       const connection = new Connection('https://api.devnet.solana.com', 'confirmed');
       const merchantWalletPubkey = new PublicKey(wallets[0].address);
+      
+      // Generate unique plan ID automatically
+      const planId = generatePlanId(formData.planName);
       
       // Create a mock wallet for Anchor
       const mockWallet = {
@@ -80,7 +95,7 @@ export default function CreatePlanModal({
           Buffer.from('merchant_plan'),
           merchantWalletPubkey.toBuffer(),
           USDC_MINT_DEVNET.toBuffer(),
-          Buffer.from(formData.planId)
+          Buffer.from(planId)
         ],
         program.programId
       );
@@ -88,7 +103,7 @@ export default function CreatePlanModal({
       // Build the instruction using Anchor
       const instruction = await program.methods
         .registerMerchant(
-          formData.planId,
+          planId,
           formData.planName,
           feeInLamports,
           intervalInSeconds
@@ -121,12 +136,12 @@ export default function CreatePlanModal({
       });
 
       console.log('Transaction signature:', result.signature);
+      console.log('Generated Plan ID:', planId);
       showSuccessToast(`Plan "${formData.planName}" created successfully!`);
       
       // Reset form
       setFormData({
         planName: '',
-        planId: '',
         feeAmount: '',
         paymentInterval: '30',
         description: '',
@@ -162,20 +177,6 @@ export default function CreatePlanModal({
               placeholder="e.g. Premium Monthly"
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900"
               maxLength={64}
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Plan ID * (unique identifier)
-            </label>
-            <input
-              type="text"
-              value={formData.planId}
-              onChange={(e) => setFormData({...formData, planId: e.target.value.toLowerCase().replace(/\s+/g, '-')})}
-              placeholder="e.g. premium-monthly"
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900"
-              maxLength={32}
             />
           </div>
 
