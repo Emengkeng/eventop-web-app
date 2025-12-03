@@ -187,6 +187,7 @@ const WalletActions = () => {
       const signedTransaction = await signTransactionSolana({
         transaction: Buffer.from(transaction, "base64"),
         wallet,
+        chain: "solana:devnet",
       });
       console.log(signedTransaction);
       showSuccessToast("Solana Transaction signed successfully");
@@ -255,6 +256,7 @@ const WalletActions = () => {
       const receipt = await sendTransactionSolana({
         transaction: Buffer.from(transaction, "base64"),
         wallet,
+        chain: "solana:devnet",
       });
       console.log(receipt);
 

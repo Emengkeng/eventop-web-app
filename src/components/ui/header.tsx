@@ -17,7 +17,7 @@ export function Header({ authenticated }: HeaderProps) {
       <div className="flex flex-row items-center gap-2 h-[26px]">
         <Image
           src={authenticated ? "./privy-logo-black.svg" : "./privy-logo-white.svg"}
-          alt="Privy Logo"
+          alt="Event Top Logo"
           width={104}
           height={23}
           className="w-[103.48px] h-[23.24px]"
@@ -32,7 +32,7 @@ export function Header({ authenticated }: HeaderProps) {
                 : "border-white text-white"
             }`}
           >
-            Next.js Demo
+            Solana
           </div>
         )}
       </div>
@@ -52,7 +52,7 @@ export function Header({ authenticated }: HeaderProps) {
         <button className="button-primary rounded-full hidden md:block">
           <a
             className="flex flex-row items-center gap-2"
-            href="https://dashboard.privy.io/"
+            href="/dashboard"
             target="_blank"
             rel="noreferrer"
           >
