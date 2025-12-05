@@ -42,7 +42,7 @@ export function Header({ authenticated }: HeaderProps) {
           className={`flex flex-row items-center gap-1 cursor-pointer ${
             authenticated ? "text-primary" : "text-white"
           }`}
-          href="https://docs.privy.io/basics/react/installation"
+          href="https://docs.eventop.xyz"
           target="_blank"
           rel="noreferrer"
         >
