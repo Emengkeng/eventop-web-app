@@ -332,8 +332,6 @@ export default function WebhooksTab({ merchantWallet }: WebhooksTabProps) {
 
   useEffect(() => {
     fetchData();
-    const interval = setInterval(fetchData, 10000); // Refresh every 10s
-    return () => clearInterval(interval);
   }, [merchantWallet, view]);
 
   const fetchData = async () => {
