@@ -11,6 +11,7 @@ import DashboardNavigation from '@/components/merchant/DashboardNavigation';
 import OverviewTab from '@/components/merchant/OverviewTab';
 import PlansTab from '@/components/merchant/PlansTab';
 import CustomersTab from '@/components/merchant/CustomersTab';
+import WebhooksTab from '@/components/merchant/WebhookTabs';
 import WalletSetupModal from '@/components/merchant/WalletSetupModal';
 import LoginScreen from '@/components/merchant/LoginScreen';
 
@@ -18,7 +19,7 @@ import { merchantApi, subscriptionApi, analyticsApi } from '../../services/api';
 import { Analytics, MerchantPlan, Customer } from '@/types/merchant';
 
 const MerchantDashboard = () => {
-  const [activeTab, setActiveTab] = useState<'overview' | 'plans' | 'customers'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'plans' | 'customers' | 'webhooks'>('overview');
   const [showWalletSetup, setShowWalletSetup] = useState(false);
   const [analytics, setAnalytics] = useState<Analytics | null>(null);
   const [plans, setPlans] = useState<MerchantPlan[]>([]);
@@ -49,7 +50,7 @@ const MerchantDashboard = () => {
     setLoading(true);
 
     try {
-      // Fetch based on active tab
+      // Fetch based on active tab (webhooks tab handles its own data)
       if (activeTab === 'overview') {
         const [analyticsData, plansData] = await Promise.all([
           merchantApi.getAnalytics(merchantWallet),
@@ -64,6 +65,7 @@ const MerchantDashboard = () => {
         const customersData = await merchantApi.getCustomers(merchantWallet);
         setCustomers(customersData);
       }
+      // webhooks tab is not included here as it manages its own state
     } catch (error) {
       console.error('Error fetching merchant data:', error);
     } finally {
@@ -124,6 +126,12 @@ const MerchantDashboard = () => {
           <CustomersTab
             customers={customers}
             loading={loading}
+          />
+        )}
+
+        {activeTab === 'webhooks' && (
+          <WebhooksTab
+            merchantWallet={wallets[0]?.address}
           />
         )}
       </main>
