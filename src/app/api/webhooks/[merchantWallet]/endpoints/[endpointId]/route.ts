@@ -4,13 +4,14 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { merchantWallet: string; endpointId: string } }
+  { params }: { params: Promise<{ merchantWallet: string; endpointId: string }> }
 ) {
   try {
+    const { merchantWallet, endpointId } = await params;
     const body = await request.json();
     
     const response = await fetch(
-      `${API_BASE_URL}/webhooks/${params.merchantWallet}/endpoints/${params.endpointId}`,
+      `${API_BASE_URL}/webhooks/${merchantWallet}/endpoints/${endpointId}`,
       {
         method: 'PUT',
         headers: {
@@ -33,11 +34,13 @@ export async function PUT(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { merchantWallet: string; endpointId: string } }
+  { params }: { params: Promise<{ merchantWallet: string; endpointId: string }> }
 ) {
   try {
+    const { merchantWallet, endpointId } = await params;
+    
     const response = await fetch(
-      `${API_BASE_URL}/webhooks/${params.merchantWallet}/endpoints/${params.endpointId}`,
+      `${API_BASE_URL}/webhooks/${merchantWallet}/endpoints/${endpointId}`,
       {
         method: 'DELETE',
         headers: {

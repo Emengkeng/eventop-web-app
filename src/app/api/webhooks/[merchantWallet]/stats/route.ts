@@ -4,11 +4,13 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { merchantWallet: string } }
+  { params }: { params: Promise<{ merchantWallet: string }> }
 ) {
   try {
+    const { merchantWallet } = await params;
+    
     const response = await fetch(
-      `${API_BASE_URL}/webhooks/${params.merchantWallet}/stats`,
+      `${API_BASE_URL}/webhooks/${merchantWallet}/stats`,
       {
         headers: {
           'Authorization': request.headers.get('Authorization') || '',
