@@ -28,7 +28,7 @@ function Home() {
 
   const handleCreatePlan = () => {
     // Redirect to testnet page with full reload
-    window.location.href = "/dashboard";
+    window.location.href = "/merchant";
   };
 
   return (
