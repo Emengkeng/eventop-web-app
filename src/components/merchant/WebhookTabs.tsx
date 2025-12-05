@@ -68,6 +68,70 @@ function CreateEndpointModal({
   const [description, setDescription] = useState('');
   const [secret, setSecret] = useState('');
   const [isCreating, setIsCreating] = useState(false);
+  const [isTesting, setIsTesting] = useState(false);
+  const [testResult, setTestResult] = useState<{
+    success: boolean;
+    status?: number;
+    message: string;
+    responseTime?: number;
+  } | null>(null);
+
+  const handleTest = async () => {
+    if (!url) {
+      showErrorToast('Please provide a URL first');
+      return;
+    }
+
+    setIsTesting(true);
+    setTestResult(null);
+
+    try {
+      const startTime = Date.now();
+      const response = await fetch(`/api/webhooks/test`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          url,
+          testPayload: {
+            event: 'webhook.test',
+            data: {
+              message: 'This is a test webhook from your subscription platform',
+              timestamp: new Date().toISOString(),
+            }
+          }
+        }),
+      });
+
+      const responseTime = Date.now() - startTime;
+      const data = await response.json();
+
+      if (response.ok && data.success) {
+        setTestResult({
+          success: true,
+          status: data.status,
+          message: `Endpoint responded successfully with status ${data.status}`,
+          responseTime,
+        });
+        showSuccessToast('Endpoint test successful!');
+      } else {
+        setTestResult({
+          success: false,
+          status: data.status,
+          message: data.error || 'Endpoint test failed',
+          responseTime,
+        });
+        showErrorToast('Endpoint test failed');
+      }
+    } catch (error) {
+      setTestResult({
+        success: false,
+        message: error instanceof Error ? error.message : 'Failed to connect to endpoint',
+      });
+      showErrorToast('Failed to test endpoint');
+    } finally {
+      setIsTesting(false);
+    }
+  };
 
   const handleCreate = async () => {
     if (!url || events.length === 0) {
@@ -97,6 +161,15 @@ function CreateEndpointModal({
     }
   };
 
+  const handleClose = () => {
+    setUrl('');
+    setEvents(AVAILABLE_EVENTS);
+    setDescription('');
+    setSecret('');
+    setTestResult(null);
+    onClose();
+  };
+
   if (!isOpen) return null;
 
   return (
@@ -122,12 +195,7 @@ function CreateEndpointModal({
               </div>
             </div>
             <button
-              onClick={() => {
-                setSecret('');
-                setUrl('');
-                setDescription('');
-                onClose();
-              }}
+              onClick={handleClose}
               className="w-full px-4 py-3 bg-gray-900 text-white rounded-lg font-medium hover:bg-gray-800"
             >
               Done
@@ -139,14 +207,59 @@ function CreateEndpointModal({
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Endpoint URL *
               </label>
-              <input
-                type="url"
-                value={url}
-                onChange={(e) => setUrl(e.target.value)}
-                placeholder="https://your-api.com/webhooks"
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900"
-              />
+              <div className="flex gap-2">
+                <input
+                  type="url"
+                  value={url}
+                  onChange={(e) => setUrl(e.target.value)}
+                  placeholder="https://your-api.com/webhooks"
+                  className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900"
+                />
+                <button
+                  onClick={handleTest}
+                  disabled={isTesting || !url}
+                  className="px-4 py-3 border border-gray-300 rounded-lg font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
+                >
+                  {isTesting ? 'Testing...' : 'Test'}
+                </button>
+              </div>
             </div>
+
+            {testResult && (
+              <div
+                className={`rounded-lg p-4 ${
+                  testResult.success
+                    ? 'bg-green-50 border border-green-200'
+                    : 'bg-red-50 border border-red-200'
+                }`}
+              >
+                <div className="flex items-start gap-2">
+                  {testResult.success ? (
+                    <CheckCircle2 className="w-5 h-5 text-green-600 mt-0.5" />
+                  ) : (
+                    <AlertCircle className="w-5 h-5 text-red-600 mt-0.5" />
+                  )}
+                  <div className="flex-1">
+                    <p
+                      className={`text-sm font-medium ${
+                        testResult.success ? 'text-green-800' : 'text-red-800'
+                      }`}
+                    >
+                      {testResult.message}
+                    </p>
+                    {testResult.responseTime && (
+                      <p
+                        className={`text-xs mt-1 ${
+                          testResult.success ? 'text-green-600' : 'text-red-600'
+                        }`}
+                      >
+                        Response time: {testResult.responseTime}ms
+                      </p>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -188,7 +301,7 @@ function CreateEndpointModal({
 
             <div className="flex gap-3">
               <button
-                onClick={onClose}
+                onClick={handleClose}
                 disabled={isCreating}
                 className="flex-1 px-4 py-3 border border-gray-300 rounded-lg font-medium text-gray-700 hover:bg-gray-50"
               >
