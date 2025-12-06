@@ -20,17 +20,10 @@ interface CreatePlanModalProps {
   merchantWallet: string;
 }
 
-// Generate a unique plan ID
-const generatePlanId = (planName: string): string => {
-  const timestamp = Date.now();
-  const random = Math.random().toString(36).substring(2, 8);
-  const cleanName = planName
-    .toLowerCase()
-    .replace(/[^a-z0-9]/g, '-')
-    .replace(/-+/g, '-')
-    .substring(0, 16);
-  
-  return `${cleanName}-${timestamp}-${random}`;
+const generatePlanId = (): string => {
+  const timestamp = Date.now().toString(36);
+  const random = Math.random().toString(36).substring(2, 10);
+  return `${timestamp}-${random}`;
 };
 
 export default function CreatePlanModal({ 
@@ -68,7 +61,7 @@ export default function CreatePlanModal({
       const merchantWalletPubkey = new PublicKey(wallets[0].address);
       
       // Generate unique plan ID automatically
-      const planId = generatePlanId(formData.planName);
+      const planId = generatePlanId();
       
       // Create a mock wallet for Anchor
       const mockWallet = {
@@ -88,6 +81,7 @@ export default function CreatePlanModal({
       // Convert values
       const feeInLamports = new BN(Math.floor(parseFloat(formData.feeAmount) * 1_000_000));
       const intervalInSeconds = new BN(parseInt(formData.paymentInterval) * 86400);
+      console.log('Creating plan with ID:', planId, merchantWalletPubkey.toBase58());
       
       // Derive PDA
       const [merchantPlanPda] = PublicKey.findProgramAddressSync(
