@@ -26,7 +26,9 @@ export interface Customer {
   planName: string;
   feeAmount: string;
   paymentCount: number;
-  isActive: boolean;
   lastPaymentTimestamp: string;
+  totalPaid: string;
+  isActive: boolean;
   createdAt: string;
+  cancelledAt: string | null;
 }
