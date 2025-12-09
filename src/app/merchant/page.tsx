@@ -18,9 +18,10 @@ import LoginScreen from '@/components/merchant/LoginScreen';
 
 import { merchantApi, subscriptionApi, analyticsApi } from '../../services/api';
 import { Analytics, MerchantPlan, Customer } from '@/types/merchant';
+import SettingsTab from '@/components/merchant/SettingsTab';
 
 const MerchantDashboard = () => {
-  const [activeTab, setActiveTab] = useState<'overview' | 'plans' | 'customers' | 'webhooks' | 'api-keys'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'plans' | 'customers' | 'webhooks' | 'api-keys' | 'settings'>('overview');
   
   const [showWalletSetup, setShowWalletSetup] = useState(false);
   const [analytics, setAnalytics] = useState<Analytics | null>(null);
@@ -135,6 +136,12 @@ const MerchantDashboard = () => {
 
         {activeTab === 'api-keys' && (
           <ApiKeysTab
+            merchantWallet={wallets[0]?.address}
+          />
+        )}
+
+        {activeTab === 'settings' && (
+          <SettingsTab
             merchantWallet={wallets[0]?.address}
           />
         )}
