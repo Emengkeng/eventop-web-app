@@ -1,9 +1,9 @@
 import React from 'react';
-import { BarChart3, CreditCard, Users, Webhook } from 'lucide-react';
+import { BarChart3, CreditCard, Users, Webhook, Key } from 'lucide-react';
 
 interface DashboardNavigationProps {
-  activeTab: 'overview' | 'plans' | 'customers' | 'webhooks';
-  onTabChange: (tab: 'overview' | 'plans' | 'customers' | 'webhooks') => void;
+  activeTab: 'overview' | 'plans' | 'customers' | 'webhooks' | 'api-keys';
+  onTabChange: (tab: 'overview' | 'plans' | 'customers' | 'webhooks' | 'api-keys') => void;
 }
 
 export default function DashboardNavigation({
@@ -15,6 +15,7 @@ export default function DashboardNavigation({
     { id: 'plans', label: 'Plans', icon: CreditCard },
     { id: 'customers', label: 'Customers', icon: Users },
     { id: 'webhooks', label: 'Webhooks', icon: Webhook },
+    { id: 'api-keys', label: 'API Keys', icon: Key },
   ] as const;
 
   return (
