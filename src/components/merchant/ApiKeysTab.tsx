@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { usePrivy } from '@privy-io/react-auth';
 import {
   Key,
   Plus,
@@ -38,6 +39,7 @@ function CreateApiKeyModal({
   const [name, setName] = useState('');
   const [isCreating, setIsCreating] = useState(false);
   const [createdKey, setCreatedKey] = useState<string | null>(null);
+  const { getAccessToken } = usePrivy();
 
   const handleCreate = async () => {
     if (!name.trim()) {
@@ -47,25 +49,33 @@ function CreateApiKeyModal({
 
     setIsCreating(true);
     try {
-      const response = await fetch('/api/api-keys', {
+      const token = await getAccessToken();
+      
+      const response = await fetch(`/api/api-keys/endpoint/${merchantWallet}`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
         body: JSON.stringify({ name }),
       });
 
-      if (!response.ok) throw new Error('Failed to create API key');
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to create API key');
+      }
 
       const data = await response.json();
       setCreatedKey(data.key);
       showSuccessToast('API key created successfully!');
     } catch (error) {
-      showErrorToast('Failed to create API key');
+      showErrorToast(error instanceof Error ? error.message : 'Failed to create API key');
       console.error(error);
     } finally {
       setIsCreating(false);
     }
   };
-
+  
   const handleClose = () => {
     setName('');
     setCreatedKey(null);
@@ -176,21 +186,42 @@ export default function ApiKeysTab({ merchantWallet }: ApiKeysTabProps) {
   const [apiKeys, setApiKeys] = useState<ApiKey[]>([]);
   const [loading, setLoading] = useState(true);
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const { getAccessToken } = usePrivy();
 
   useEffect(() => {
-    fetchApiKeys();
+    if (merchantWallet) {
+      fetchApiKeys();
+    }
   }, [merchantWallet]);
 
   const fetchApiKeys = async () => {
     setLoading(true);
     try {
-      const response = await fetch('/api/api-keys');
-      if (!response.ok) throw new Error('Failed to fetch API keys');
+      const token = await getAccessToken();
+      
+      const response = await fetch(`/api/api-keys/endpoint/${merchantWallet}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to fetch API keys');
+      }
+      
       const data = await response.json();
-      setApiKeys(data);
+      
+      if (Array.isArray(data)) {
+        setApiKeys(data);
+      } else {
+        console.error('Unexpected API response format:', data);
+        setApiKeys([]);
+      }
     } catch (error) {
       console.error('Error fetching API keys:', error);
-      showErrorToast('Failed to load API keys');
+      showErrorToast(error instanceof Error ? error.message : 'Failed to load API keys');
+      setApiKeys([]);
     } finally {
       setLoading(false);
     }
@@ -202,16 +233,25 @@ export default function ApiKeysTab({ merchantWallet }: ApiKeysTabProps) {
     }
 
     try {
+      const token = await getAccessToken();
+      
       const response = await fetch(`/api/api-keys/${keyId}`, {
         method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify({ merchantWallet })
       });
 
-      if (!response.ok) throw new Error('Failed to revoke API key');
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to revoke API key');
+      }
 
       showSuccessToast('API key revoked successfully');
       fetchApiKeys();
     } catch (error) {
-      showErrorToast('Failed to revoke API key');
+      showErrorToast(error instanceof Error ? error.message : 'Failed to revoke API key');
       console.error(error);
     }
   };

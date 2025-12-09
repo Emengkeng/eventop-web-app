@@ -12,6 +12,7 @@ import OverviewTab from '@/components/merchant/OverviewTab';
 import PlansTab from '@/components/merchant/PlansTab';
 import CustomersTab from '@/components/merchant/CustomersTab';
 import WebhooksTab from '@/components/merchant/WebhookTabs';
+import ApiKeysTab from '@/components/merchant/ApiKeysTab'; // ADD THIS IMPORT
 import WalletSetupModal from '@/components/merchant/WalletSetupModal';
 import LoginScreen from '@/components/merchant/LoginScreen';
 
@@ -19,7 +20,8 @@ import { merchantApi, subscriptionApi, analyticsApi } from '../../services/api';
 import { Analytics, MerchantPlan, Customer } from '@/types/merchant';
 
 const MerchantDashboard = () => {
-  const [activeTab, setActiveTab] = useState<'overview' | 'plans' | 'customers' | 'webhooks'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'plans' | 'customers' | 'webhooks' | 'api-keys'>('overview');
+  
   const [showWalletSetup, setShowWalletSetup] = useState(false);
   const [analytics, setAnalytics] = useState<Analytics | null>(null);
   const [plans, setPlans] = useState<MerchantPlan[]>([]);
@@ -29,14 +31,12 @@ const MerchantDashboard = () => {
   const { ready, authenticated, login, logout, user } = usePrivy();
   const { wallets } = useWallets();
 
-  // Check if user needs wallet setup
   useEffect(() => {
     if (authenticated && wallets.length === 0) {
       setShowWalletSetup(true);
     }
   }, [authenticated, wallets]);
 
-  // Fetch merchant data
   useEffect(() => {
     if (authenticated && wallets.length > 0) {
       fetchMerchantData();
@@ -50,7 +50,6 @@ const MerchantDashboard = () => {
     setLoading(true);
 
     try {
-      // Fetch based on active tab (webhooks tab handles its own data)
       if (activeTab === 'overview') {
         const [analyticsData, plansData] = await Promise.all([
           merchantApi.getAnalytics(merchantWallet),
@@ -65,7 +64,6 @@ const MerchantDashboard = () => {
         const customersData = await merchantApi.getCustomers(merchantWallet);
         setCustomers(customersData);
       }
-      // webhooks tab is not included here as it manages its own state
     } catch (error) {
       console.error('Error fetching merchant data:', error);
     } finally {
@@ -131,6 +129,12 @@ const MerchantDashboard = () => {
 
         {activeTab === 'webhooks' && (
           <WebhooksTab
+            merchantWallet={wallets[0]?.address}
+          />
+        )}
+
+        {activeTab === 'api-keys' && (
+          <ApiKeysTab
             merchantWallet={wallets[0]?.address}
           />
         )}
