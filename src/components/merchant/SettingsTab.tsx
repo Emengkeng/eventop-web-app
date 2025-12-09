@@ -9,8 +9,11 @@ import {
   Save,
   Copy,
   CheckCircle2,
+  Upload,
+  X,
 } from 'lucide-react';
 import { showSuccessToast, showErrorToast } from '@/components/ui/custom-toast';
+import { UploadButton } from '@/utils/uploadthing';
 
 interface MerchantProfile {
   walletAddress: string;
@@ -60,7 +63,6 @@ export default function SettingsTab({ merchantWallet }: SettingsTabProps) {
       const data = await response.json();
       setProfile(data);
       
-      // Set form data
       setFormData({
         companyName: data.companyName || '',
         email: data.email || '',
@@ -106,6 +108,10 @@ export default function SettingsTab({ merchantWallet }: SettingsTabProps) {
   const copyToClipboard = (text: string, label: string) => {
     navigator.clipboard.writeText(text);
     showSuccessToast(`${label} copied to clipboard`);
+  };
+
+  const handleRemoveLogo = () => {
+    setFormData({ ...formData, logoUrl: '' });
   };
 
   if (loading) {
@@ -185,30 +191,87 @@ export default function SettingsTab({ merchantWallet }: SettingsTabProps) {
             />
           </div>
 
-          {/* Logo URL */}
+          {/* Logo Upload with UploadThing */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               <div className="flex items-center gap-2">
                 <Image className="w-4 h-4" />
-                Logo URL
+                Company Logo
               </div>
             </label>
-            <input
-              type="url"
-              value={formData.logoUrl}
-              onChange={(e) => setFormData({ ...formData, logoUrl: e.target.value })}
-              placeholder="https://yourcompany.com/logo.png"
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900"
-            />
-            {formData.logoUrl && (
-              <div className="mt-3 p-3 border border-gray-200 rounded-lg bg-gray-50">
-                <p className="text-xs text-gray-600 mb-2">Preview:</p>
-                <img 
-                  src={formData.logoUrl} 
-                  alt="Logo preview" 
-                  className="h-12 object-contain"
-                  onError={(e) => {
-                    e.currentTarget.style.display = 'none';
+
+            {formData.logoUrl ? (
+              <div className="space-y-3">
+                <div className="relative border border-gray-200 rounded-lg p-4 bg-gray-50">
+                  <button
+                    onClick={handleRemoveLogo}
+                    className="absolute top-2 right-2 p-1.5 bg-red-100 hover:bg-red-200 rounded-full transition-colors"
+                    title="Remove logo"
+                  >
+                    <X className="w-4 h-4 text-red-600" />
+                  </button>
+                  <div className="flex items-center gap-4">
+                    <img
+                      src={formData.logoUrl}
+                      alt="Company logo"
+                      className="h-16 w-16 object-contain rounded"
+                      onError={(e) => {
+                        e.currentTarget.src = '/placeholder-logo.png';
+                      }}
+                    />
+                    <div className="flex-1">
+                      <p className="text-sm font-medium text-gray-900">Current Logo</p>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="flex items-center gap-2">
+                  <div className="flex-1">
+                    <UploadButton
+                      endpoint="merchantLogo"
+                      onClientUploadComplete={(res) => {
+                        if (res && res[0]) {
+                          setFormData({ ...formData, logoUrl: res[0].ufsUrl });
+                          showSuccessToast('Logo uploaded successfully!');
+                        }
+                      }}
+                      onUploadError={(error: Error) => {
+                        showErrorToast(`Upload failed: ${error.message}`);
+                      }}
+                      appearance={{
+                        button: "ut-ready:bg-gray-900 ut-uploading:cursor-not-allowed ut-uploading:bg-gray-400 bg-gray-900 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-800 transition-colors",
+                        allowedContent: "text-xs text-gray-500",
+                      }}
+                      content={{
+                        button: "Replace Logo",
+                        allowedContent: "Max 4MB",
+                      }}
+                    />
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
+                <Upload className="w-8 h-8 text-gray-400 mx-auto mb-2" />
+                <p className="text-sm text-gray-600 mb-3">Upload your company logo</p>
+                <UploadButton
+                  endpoint="merchantLogo"
+                  onClientUploadComplete={(res) => {
+                    if (res && res[0]) {
+                      setFormData({ ...formData, logoUrl: res[0].url });
+                      showSuccessToast('Logo uploaded successfully!');
+                    }
+                  }}
+                  onUploadError={(error: Error) => {
+                    showErrorToast(`Upload failed: ${error.message}`);
+                  }}
+                  appearance={{
+                    button: "ut-ready:bg-gray-900 ut-uploading:cursor-not-allowed ut-uploading:bg-gray-400 bg-gray-900 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-800 transition-colors",
+                    allowedContent: "text-xs text-gray-500 mt-2",
+                  }}
+                  content={{
+                    button: "Choose Logo",
+                    allowedContent: "Image (Max 4MB)",
                   }}
                 />
               </div>

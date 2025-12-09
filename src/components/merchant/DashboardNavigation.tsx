@@ -1,5 +1,5 @@
 import React from 'react';
-import { BarChart3, CreditCard, Users, Webhook, Key } from 'lucide-react';
+import { BarChart3, CreditCard, Users, Webhook, Key, Settings } from 'lucide-react';
 
 interface DashboardNavigationProps {
   activeTab: 'overview' | 'plans' | 'customers' | 'webhooks' | 'api-keys' | 'settings';
