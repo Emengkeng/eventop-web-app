@@ -10,7 +10,7 @@ export async function GET(
     const { sessionId } = await params;
     
     const response = await fetch(
-      `${API_BASE_URL}/checkout/session/${sessionId}`,
+      `${API_BASE_URL}/checkout/${sessionId}`,
       {
         method: 'GET',
         headers: {
@@ -48,7 +48,7 @@ export async function POST(
     const body = await request.json();
     
     const response = await fetch(
-      `${API_BASE_URL}/checkout/session/${sessionId}/complete`,
+      `${API_BASE_URL}/checkout/${sessionId}/complete`,
       {
         method: 'POST',
         headers: {
@@ -87,7 +87,7 @@ export async function DELETE(
     const response = await fetch(
       `${API_BASE_URL}/checkout/session/${sessionId}/cancel`,
       {
-        method: 'DELETE',
+        method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
