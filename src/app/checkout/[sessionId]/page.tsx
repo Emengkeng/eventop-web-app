@@ -12,7 +12,8 @@ export default function CheckoutPage() {
 
   useEffect(() => {
     loadSession();
-    detectApp();
+    // detectApp(); // Commented out for testing
+    setHasApp(true); // Always assume app is installed for testing
   }, [sessionId]);
 
   const loadSession = async () => {
@@ -21,48 +22,29 @@ export default function CheckoutPage() {
     setSession(data);
   };
 
-  const detectApp = () => {
-    const deepLink = `exp://8gtihio-jussec-8081.exp.direct/--/ping`;
-    //const deepLink = `eventop://ping`;
-    
-    let appDetected = false;
-    
-    // Create a hidden iframe to attempt the deep link (more reliable)
-    const iframe = document.createElement('iframe');
-    iframe.style.display = 'none';
-    iframe.src = deepLink;
-    document.body.appendChild(iframe);
-    
-    // If app opens, this page will blur
-    const handleBlur = () => {
-      appDetected = true;
-      setHasApp(true);
-    };
-    
-    // Listen for visibility change (more reliable than blur)
-    const handleVisibilityChange = () => {
-      if (document.hidden) {
-        appDetected = true;
-        setHasApp(true);
-      }
-    };
-    
-    window.addEventListener('blur', handleBlur);
-    document.addEventListener('visibilitychange', handleVisibilityChange);
-    
-    // If still here after 2 seconds, app not installed
-    setTimeout(() => {
-      // Clean up iframe
-      document.body.removeChild(iframe);
-      
-      if (!appDetected) {
-        setHasApp(false);
-      }
-      
-      window.removeEventListener('blur', handleBlur);
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
-    }, 2000);
-  };
+  // const detectApp = () => {
+  //   const deepLink = `exp://8gtihio-jussec-8081.exp.direct/--/ping`;
+  //   //const deepLink = `eventop://ping`;
+  //   
+  //   // Attempt deep link
+  //   const start = Date.now();
+  //   window.location.href = deepLink;
+  //   
+  //   // If app opens, this page will blur
+  //   const handleBlur = () => {
+  //     setHasApp(true);
+  //   };
+  //   
+  //   window.addEventListener('blur', handleBlur);
+  //   
+  //   // If still here after 2 seconds, app not installed
+  //   setTimeout(() => {
+  //     if (Date.now() - start > 1500) {
+  //       setHasApp(false);
+  //     }
+  //     window.removeEventListener('blur', handleBlur);
+  //   }, 2000);
+  // };
 
   if (!session){
     return (
@@ -111,10 +93,10 @@ export default function CheckoutPage() {
             <p className="font-semibold text-gray-900">{session.customerEmail}</p>
           </div>
 
-          {/* App Status */}
-          {hasApp === false && <AppDownloadPrompt session={session} />}
+          {/* App Status - Skip detection for testing */}
+          {/* {hasApp === false && <AppDownloadPrompt session={session} />} */}
           {hasApp === true && <AppInstalledFlow session={session} />}
-          {hasApp === null && <DetectingAppStatus />}
+          {/* {hasApp === null && <DetectingAppStatus />} */}
 
         </div>
       </div>
