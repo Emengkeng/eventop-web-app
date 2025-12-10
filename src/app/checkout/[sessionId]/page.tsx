@@ -22,7 +22,8 @@ export default function CheckoutPage() {
   };
 
   const detectApp = () => {
-    const deepLink = `eventop://ping`;
+    const deepLink = `exp://8gtihio-jussec-8081.exp.direct/--/ping`;
+    //const deepLink = `expo://ping`;
     
     // Attempt deep link
     const start = Date.now();
