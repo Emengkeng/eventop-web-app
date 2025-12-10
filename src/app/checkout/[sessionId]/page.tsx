@@ -25,23 +25,42 @@ export default function CheckoutPage() {
     const deepLink = `exp://8gtihio-jussec-8081.exp.direct/--/ping`;
     //const deepLink = `eventop://ping`;
     
-    // Attempt deep link
-    const start = Date.now();
-    window.location.href = deepLink;
+    let appDetected = false;
+    
+    // Create a hidden iframe to attempt the deep link (more reliable)
+    const iframe = document.createElement('iframe');
+    iframe.style.display = 'none';
+    iframe.src = deepLink;
+    document.body.appendChild(iframe);
     
     // If app opens, this page will blur
     const handleBlur = () => {
+      appDetected = true;
       setHasApp(true);
     };
     
+    // Listen for visibility change (more reliable than blur)
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        appDetected = true;
+        setHasApp(true);
+      }
+    };
+    
     window.addEventListener('blur', handleBlur);
+    document.addEventListener('visibilitychange', handleVisibilityChange);
     
     // If still here after 2 seconds, app not installed
     setTimeout(() => {
-      if (Date.now() - start > 1500) {
+      // Clean up iframe
+      document.body.removeChild(iframe);
+      
+      if (!appDetected) {
         setHasApp(false);
       }
+      
       window.removeEventListener('blur', handleBlur);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
     }, 2000);
   };
 
