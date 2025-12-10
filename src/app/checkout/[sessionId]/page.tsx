@@ -23,7 +23,7 @@ export default function CheckoutPage() {
 
   const detectApp = () => {
     const deepLink = `exp://8gtihio-jussec-8081.exp.direct/--/ping`;
-    //const deepLink = `expo://ping`;
+    //const deepLink = `eventop://ping`;
     
     // Attempt deep link
     const start = Date.now();
@@ -188,7 +188,8 @@ function AppInstalledFlow({ session }: { session: any }) {
     setOpening(true);
     
     // Open app with deep link
-    const deepLink = `eventop://subscribe?sessionId=${session.sessionId}`;
+    const deepLink = `exp://8gtihio-jussec-8081.exp.direct/--/subscribe?sessionId=${session.sessionId}`
+    // const deepLink = `eventop://subscribe?sessionId=${session.sessionId}`;
     window.location.href = deepLink;
 
     // Fallback: if app doesn't open in 3 seconds, show help
