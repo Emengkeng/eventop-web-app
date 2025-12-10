@@ -12,6 +12,7 @@ import {
   Clock,
 } from 'lucide-react';
 import { showSuccessToast, showErrorToast } from '@/components/ui/custom-toast';
+import { usePrivy } from '@privy-io/react-auth';
 
 interface WebhookEndpoint {
   id: string;
@@ -75,6 +76,7 @@ function CreateEndpointModal({
     message: string;
     responseTime?: number;
   } | null>(null);
+  const { getAccessToken } = usePrivy();
 
   const handleTest = async () => {
     if (!url) {
@@ -141,11 +143,15 @@ function CreateEndpointModal({
 
     setIsCreating(true);
     try {
+      const token = await getAccessToken();
       const response = await fetch(
         `/api/webhooks/${merchantWallet}/endpoints`,
         {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
           body: JSON.stringify({ url, events, description }),
         },
       );
@@ -442,6 +448,7 @@ export default function WebhooksTab({ merchantWallet }: WebhooksTabProps) {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState<any>(null);
+  const { getAccessToken } = usePrivy();
 
   useEffect(() => {
     fetchData();
@@ -450,18 +457,44 @@ export default function WebhooksTab({ merchantWallet }: WebhooksTabProps) {
   const fetchData = async () => {
     setLoading(true);
     try {
+      const token = await getAccessToken();
       const [endpointsRes, logsRes, statsRes] = await Promise.all([
-        fetch(`/api/webhooks/${merchantWallet}/endpoints`),
-        fetch(`/api/webhooks/${merchantWallet}/logs?limit=50`),
-        fetch(`/api/webhooks/${merchantWallet}/stats`),
+        fetch(`/api/webhooks/${merchantWallet}/endpoints`, {
+          headers: { 'Authorization': `Bearer ${token}` },
+        }),
+        fetch(`/api/webhooks/${merchantWallet}/logs?limit=50`, {
+          headers: { 'Authorization': `Bearer ${token}` },
+        }),
+        fetch(`/api/webhooks/${merchantWallet}/stats`, {
+          headers: { 'Authorization': `Bearer ${token}` },
+        }),
       ]);
 
-      setEndpoints(await endpointsRes.json());
-      const logsData = await logsRes.json();
-      setLogs(logsData.logs);
-      setStats(await statsRes.json());
+      if (endpointsRes.ok) {
+        const endpointsData = await endpointsRes.json();
+        setEndpoints(Array.isArray(endpointsData) ? endpointsData : []);
+      } else {
+        setEndpoints([]);
+      }
+
+      if (logsRes.ok) {
+        const logsData = await logsRes.json();
+        setLogs(Array.isArray(logsData.logs) ? logsData.logs : []);
+      } else {
+        setLogs([]);
+      }
+
+      if (statsRes.ok) {
+        setStats(await statsRes.json());
+      } else {
+        setStats(null);
+      }
     } catch (error) {
       console.error('Error fetching webhook data:', error);
+      setEndpoints([]);
+      setLogs([]);
+      setStats(null);
+      showErrorToast('Failed to load webhook data');
     } finally {
       setLoading(false);
     }
@@ -469,9 +502,10 @@ export default function WebhooksTab({ merchantWallet }: WebhooksTabProps) {
 
   const toggleEndpoint = async (endpointId: string, isActive: boolean) => {
     try {
+      const token = await getAccessToken();
       await fetch(`/api/webhooks/${merchantWallet}/endpoints/${endpointId}`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Authorization': `Bearer ${token}` },
         body: JSON.stringify({ isActive: !isActive }),
       });
       showSuccessToast(
@@ -485,10 +519,12 @@ export default function WebhooksTab({ merchantWallet }: WebhooksTabProps) {
 
   const deleteEndpoint = async (endpointId: string) => {
     if (!confirm('Are you sure you want to delete this endpoint?')) return;
+    const token = await getAccessToken();
 
     try {
       await fetch(`/api/webhooks/${merchantWallet}/endpoints/${endpointId}`, {
         method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` },
       });
       showSuccessToast('Endpoint deleted successfully');
       fetchData();
