@@ -189,7 +189,7 @@ function AppInstalledFlow({ session }: { session: any }) {
     setOpening(true);
     
     // Open app with deep link
-    const deepLink = `exp://8gtihio-jussec-8081.exp.direct/--/subscribe?sessionId=${session.sessionId}`
+    const deepLink = `exp://8gtihio-jussec-8081.exp.direct/--/subscribe/${session.sessionId}`
     // const deepLink = `eventop://subscribe?sessionId=${session.sessionId}`;
     window.location.href = deepLink;
 
