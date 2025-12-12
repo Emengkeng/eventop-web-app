@@ -20,13 +20,13 @@ body {
 
 @layer components {
   .button-primary {
-    @apply bg-[#5B4FFF] hover:bg-[#4A3EE6] focus:bg-[#4A3EE6] active:bg-[#3F35D9]
+    @apply bg-[#171717] hover:bg-[#171717] focus:bg-[#171717] active:bg-[#3F35D9]
            disabled:bg-gray-300 disabled:cursor-not-allowed
            text-white font-medium
            px-4 py-2 rounded-md
            border border-transparent
            transition-colors duration-200 ease-in-out
-           focus:outline-none focus:ring-2 focus:ring-[#5B4FFF] focus:ring-offset-2
+           focus:outline-none focus:ring-2 focus:ring-[#171717] focus:ring-offset-2
            inline-flex items-center justify-center
            text-sm leading-5 cursor-pointer;
   }
