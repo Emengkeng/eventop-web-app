@@ -52,7 +52,7 @@ export function Header({ authenticated }: HeaderProps) {
         <button className="button-primary rounded-full hidden md:block">
           <a
             className="flex flex-row items-center gap-2"
-            href="/dashboard"
+            href="/merchant"
             target="_blank"
             rel="noreferrer"
           >
