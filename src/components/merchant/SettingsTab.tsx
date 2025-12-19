@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { usePrivy } from '@privy-io/react-auth';
 import {
   User,
@@ -11,9 +11,9 @@ import {
   CheckCircle2,
   Upload,
   X,
+  Loader2,
 } from 'lucide-react';
 import { showSuccessToast, showErrorToast } from '@/components/ui/custom-toast';
-import { UploadButton } from '@/utils/uploadthing';
 
 interface MerchantProfile {
   walletAddress: string;
@@ -31,6 +31,8 @@ export default function SettingsTab({ merchantWallet }: SettingsTabProps) {
   const [profile, setProfile] = useState<MerchantProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const { getAccessToken } = usePrivy();
 
   const [formData, setFormData] = useState({
@@ -87,7 +89,10 @@ export default function SettingsTab({ merchantWallet }: SettingsTabProps) {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`,
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({
+          companyName: formData.companyName,
+          email: formData.email,
+        }),
       });
 
       if (!response.ok) {
@@ -105,13 +110,100 @@ export default function SettingsTab({ merchantWallet }: SettingsTabProps) {
     }
   };
 
+  const handleFileSelect = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+    if (!allowedTypes.includes(file.type)) {
+      showErrorToast('Please select a valid image file (JPEG, PNG, WebP, or GIF)');
+      return;
+    }
+
+    const maxSize = 4 * 1024 * 1024;
+    if (file.size > maxSize) {
+      showErrorToast('File size must be less than 4MB');
+      return;
+    }
+
+    setUploading(true);
+    try {
+      const token = await getAccessToken();
+      
+      const formData = new FormData();
+      formData.append('file', file);
+
+      const response = await fetch(`/api/upload/merchant/${merchantWallet}/logo`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+        body: formData,
+      });
+
+      const contentType = response.headers.get('content-type');
+      if (!contentType?.includes('application/json')) {
+        console.error('Server returned non-JSON response');
+        throw new Error('Upload service unavailable. Please ensure backend is running.');
+      }
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to upload logo');
+      }
+
+      const data = await response.json();
+      
+      setFormData(prev => ({ ...prev, logoUrl: data.url }));
+      
+      await fetchProfile();
+      
+      showSuccessToast('Logo uploaded successfully!');
+    } catch (error) {
+      console.error('Error uploading logo:', error);
+      showErrorToast(error instanceof Error ? error.message : 'Failed to upload logo');
+    } finally {
+      setUploading(false);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+    }
+  };
+
+  const handleRemoveLogo = async () => {
+    if (!confirm('Are you sure you want to remove your logo?')) {
+      return;
+    }
+
+    setUploading(true);
+    try {
+      const token = await getAccessToken();
+      
+      const response = await fetch(`/api/upload/merchant/${merchantWallet}/logo`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to delete logo');
+      }
+
+      setFormData(prev => ({ ...prev, logoUrl: '' }));
+      await fetchProfile();
+      showSuccessToast('Logo removed successfully!');
+    } catch (error) {
+      console.error('Error deleting logo:', error);
+      showErrorToast('Failed to remove logo');
+    } finally {
+      setUploading(false);
+    }
+  };
+
   const copyToClipboard = (text: string, label: string) => {
     navigator.clipboard.writeText(text);
     showSuccessToast(`${label} copied to clipboard`);
-  };
-
-  const handleRemoveLogo = () => {
-    setFormData({ ...formData, logoUrl: '' });
   };
 
   if (loading) {
@@ -191,7 +283,7 @@ export default function SettingsTab({ merchantWallet }: SettingsTabProps) {
             />
           </div>
 
-          {/* Logo Upload with UploadThing */}
+          {/* Logo Upload */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               <div className="flex items-center gap-2">
@@ -205,7 +297,8 @@ export default function SettingsTab({ merchantWallet }: SettingsTabProps) {
                 <div className="relative border border-gray-200 rounded-lg p-4 bg-gray-50">
                   <button
                     onClick={handleRemoveLogo}
-                    className="absolute top-2 right-2 p-1.5 bg-red-100 hover:bg-red-200 rounded-full transition-colors"
+                    disabled={uploading}
+                    className="absolute top-2 right-2 p-1.5 bg-red-100 hover:bg-red-200 rounded-full transition-colors disabled:opacity-50"
                     title="Remove logo"
                   >
                     <X className="w-4 h-4 text-red-600" />
@@ -225,55 +318,69 @@ export default function SettingsTab({ merchantWallet }: SettingsTabProps) {
                   </div>
                 </div>
                 
-                <div className="flex items-center gap-2">
-                  <div className="flex-1">
-                    <UploadButton
-                      endpoint="merchantLogo"
-                      onClientUploadComplete={(res) => {
-                        if (res && res[0]) {
-                          setFormData({ ...formData, logoUrl: res[0].ufsUrl });
-                          showSuccessToast('Logo uploaded successfully!');
-                        }
-                      }}
-                      onUploadError={(error: Error) => {
-                        showErrorToast(`Upload failed: ${error.message}`);
-                      }}
-                      appearance={{
-                        button: "ut-ready:bg-gray-900 ut-uploading:cursor-not-allowed ut-uploading:bg-gray-400 bg-gray-900 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-800 transition-colors",
-                        allowedContent: "text-xs text-gray-500",
-                      }}
-                      content={{
-                        button: "Replace Logo",
-                        allowedContent: "Max 4MB",
-                      }}
-                    />
-                  </div>
+                <div>
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp,image/gif"
+                    onChange={handleFileSelect}
+                    disabled={uploading}
+                    className="hidden"
+                  />
+                  <button
+                    onClick={() => fileInputRef.current?.click()}
+                    disabled={uploading}
+                    className="inline-flex items-center gap-2 px-4 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium"
+                  >
+                    {uploading ? (
+                      <>
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                        Uploading...
+                      </>
+                    ) : (
+                      <>
+                        <Upload className="w-4 h-4" />
+                        Replace Logo
+                      </>
+                    )}
+                  </button>
+                  <p className="text-xs text-gray-500 mt-2">
+                    Max 4MB • JPEG, PNG, WebP, or GIF
+                  </p>
                 </div>
               </div>
             ) : (
               <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
                 <Upload className="w-8 h-8 text-gray-400 mx-auto mb-2" />
                 <p className="text-sm text-gray-600 mb-3">Upload your company logo</p>
-                <UploadButton
-                  endpoint="merchantLogo"
-                  onClientUploadComplete={(res) => {
-                    if (res && res[0]) {
-                      setFormData({ ...formData, logoUrl: res[0].url });
-                      showSuccessToast('Logo uploaded successfully!');
-                    }
-                  }}
-                  onUploadError={(error: Error) => {
-                    showErrorToast(`Upload failed: ${error.message}`);
-                  }}
-                  appearance={{
-                    button: "ut-ready:bg-gray-900 ut-uploading:cursor-not-allowed ut-uploading:bg-gray-400 bg-gray-900 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-800 transition-colors",
-                    allowedContent: "text-xs text-gray-500 mt-2",
-                  }}
-                  content={{
-                    button: "Choose Logo",
-                    allowedContent: "Image (Max 4MB)",
-                  }}
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp,image/gif"
+                  onChange={handleFileSelect}
+                  disabled={uploading}
+                  className="hidden"
                 />
+                <button
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={uploading}
+                  className="inline-flex items-center gap-2 px-4 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium"
+                >
+                  {uploading ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      Uploading...
+                    </>
+                  ) : (
+                    <>
+                      <Upload className="w-4 h-4" />
+                      Choose Logo
+                    </>
+                  )}
+                </button>
+                <p className="text-xs text-gray-500 mt-2">
+                  Max 4MB • JPEG, PNG, WebP, or GIF
+                </p>
               </div>
             )}
           </div>
