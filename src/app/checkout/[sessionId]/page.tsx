@@ -237,6 +237,18 @@ function AppInstalledFlow({ session }: { session: any }) {
         </div>
       </details>
 
+      <details className="text-sm text-gray-500">
+        <summary className="cursor-pointer hover:text-gray-700">
+          I dont have the app installed
+        </summary>
+        <div className="mt-2 p-3 bg-gray-50 rounded-lg">
+          <p className="mb-2">Try these steps:</p>
+          <ol className="list-decimal list-inside space-y-1">
+            <li><a href="https://expo.dev/artifacts/eas/hSQDeyJvU7aFoEVLgaMyzz.apk">Download the android version of the app</a></li>
+          </ol>
+        </div>
+      </details>
+
       <button
         onClick={() => window.location.href = session.cancelUrl}
         className="w-full text-gray-500 py-2 text-sm hover:text-gray-700"

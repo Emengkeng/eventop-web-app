@@ -49,6 +49,17 @@ export function Header({ authenticated }: HeaderProps) {
           Docs <ArrowUpRightIcon className="h-4 w-4" strokeWidth={2} />
         </a>
 
+        <a
+          className={`flex flex-row items-center gap-1 cursor-pointer ${
+            authenticated ? "text-primary" : "text-white"
+          }`}
+          href="https://demo.eventop.xyz"
+          target="_blank"
+          rel="noreferrer"
+        >
+          Demo <ArrowUpRightIcon className="h-4 w-4" strokeWidth={2} />
+        </a>
+
         <button className="button-primary rounded-full hidden md:block">
           <a
             className="flex flex-row items-center gap-2"
