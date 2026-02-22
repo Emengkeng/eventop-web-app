@@ -79,7 +79,7 @@ function syntaxHighlight(code: string, language: string): React.ReactNode[] {
   // Simple JSX/JS highlighter
   const lines = code.split("\n");
   return lines.map((line, i) => {
-    let highlighted = line
+    const highlighted = line
       // Comments
       .replace(/(\/\/.*)/g, '<span class="text-gray-500">$1</span>')
       // Strings
