@@ -12,7 +12,7 @@ export default function Navbar() {
         {/* Left nav */}
         <div className="hidden md:flex items-center gap-8">
           <Link
-            href="https://github.com"
+            href="https://github.com/eventop-s"
             className="text-xs tracking-[0.15em] uppercase text-gray-400 hover:text-[#FFFACD] transition-colors font-medium"
           >
             GitHub
@@ -24,7 +24,7 @@ export default function Navbar() {
             Docs
           </Link>
           <Link
-            href="#demo"
+            href="https://demo.eventop.xyz"
             className="text-xs tracking-[0.15em] uppercase text-gray-400 hover:text-[#FFFACD] transition-colors font-medium"
           >
             Demo
@@ -54,7 +54,7 @@ export default function Navbar() {
 
         {/* Right nav */}
         <div className="hidden md:flex items-center gap-8">
-          <Link
+          {/* <Link
             href="#"
             className="text-xs tracking-[0.15em] uppercase text-gray-400 hover:text-[#FFFACD] transition-colors font-medium"
           >
@@ -65,9 +65,9 @@ export default function Navbar() {
             className="text-xs tracking-[0.15em] uppercase text-gray-400 hover:text-[#FFFACD] transition-colors font-medium"
           >
             Discord
-          </Link>
+          </Link> */}
           <Link
-            href="#"
+            href="mailto:hello@julen.site"
             className="text-xs tracking-[0.15em] uppercase text-[#FF4C60] hover:text-[#FFFACD] transition-colors font-medium"
           >
             Contact

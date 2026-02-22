@@ -78,13 +78,13 @@ export default function Hero() {
         style={{ animationFillMode: "both", animationDelay: "0.3s" }}
       >
         <Link
-          href="#demo"
+          href="https://demo.eventop.xyz"
           className="px-8 py-3 rounded-lg font-semibold tracking-wider uppercase text-sm border-2 border-[#FF4C60] text-[#FF4C60] bg-[#FF4C60]/10 hover:bg-[#FF4C60] hover:text-[#FFFACD] transition-all duration-300 hover:scale-105"
         >
           View Demo
         </Link>
         <Link
-          href="https://github.com"
+          href="https://github.com/eventop-s"
           className="px-8 py-3 rounded-lg font-semibold tracking-wider uppercase text-sm border-2 border-[#1e1e2e] text-gray-400 transition-all duration-300 hover:border-[#FFFACD] hover:text-[#FFFACD]"
         >
           GitHub ↗
