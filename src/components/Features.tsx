@@ -10,7 +10,7 @@ const features = [
     ),
     title: "Accessibility",
     description:
-      "Eventop has full keyboard navigation support, focus trapping, and a11y compliance via aria attributes — guided tours for every user.",
+      "Eventop has full keyboard navigation support, focus trapping, and full WCAG compliance — guided tours for every user.",
   },
   {
     icon: (
@@ -23,7 +23,7 @@ const features = [
     ),
     title: "Highly Customizable",
     description:
-      "Styles kept minimal, with powerful theme tokens. Customize accent, radius, fonts, and dark/light mode — drop in and be ready instantly.",
+      "Styles kept minimal, with powerful theme tokens. Customize accent, radius, fonts, and dark/light mode — drop in and ship instantly.",
   },
   {
     icon: (
@@ -37,28 +37,26 @@ const features = [
     ),
     title: "Framework Ready",
     description:
-      "Drop into any React or Next.js app. Works with shadcn/ui, MUI, Radix, Tailwind, or any component library. Zero modifications to your existing components.",
+      "Drop into any React or Next.js app. Works with shadcn/ui, MUI, Radix, Headless UI, or any component library. Zero modifications to your existing components.",
   },
 ];
 
 export default function Features() {
   return (
     <section className="relative py-24 px-6">
-      {/* Section separator */}
       <div className="max-w-6xl mx-auto">
         <div className="w-full h-px bg-gradient-to-r from-transparent via-[#FF4C60] to-transparent mb-24 opacity-40" />
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {features.map((feature, i) => (
+          {features.map((feature) => (
             <div
               key={feature.title}
               className="hover-lift group relative rounded-2xl border border-[#1e1e2e] bg-[#12121a] p-8 flex flex-col items-center text-center"
-              style={{ animationDelay: `${i * 0.1}s` }}
             >
-              {/* Top accent line */}
+              {/* Top accent line on hover */}
               <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#FF4C60] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
-              {/* Icon placeholder area */}
+              {/* Icon */}
               <div className="mb-6 w-24 h-24 rounded-xl bg-[#0a0a0f] border border-[#1e1e2e] flex items-center justify-center group-hover:border-[#FF4C60]/40 transition-colors duration-300">
                 {feature.icon}
               </div>
