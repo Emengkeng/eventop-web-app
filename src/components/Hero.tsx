@@ -79,20 +79,7 @@ export default function Hero() {
       >
         <Link
           href="#demo"
-          className="px-8 py-3 rounded-lg font-semibold tracking-wider uppercase text-sm border-2 transition-all duration-300 hover:scale-105"
-          style={{
-            borderColor: "#FF4C60",
-            color: "#FF4C60",
-            background: "rgba(255,76,96,0.08)",
-          }}
-          onMouseEnter={(e) => {
-            (e.currentTarget as HTMLAnchorElement).style.background = "#FF4C60";
-            (e.currentTarget as HTMLAnchorElement).style.color = "#FFFACD";
-          }}
-          onMouseLeave={(e) => {
-            (e.currentTarget as HTMLAnchorElement).style.background = "rgba(255,76,96,0.08)";
-            (e.currentTarget as HTMLAnchorElement).style.color = "#FF4C60";
-          }}
+          className="px-8 py-3 rounded-lg font-semibold tracking-wider uppercase text-sm border-2 border-[#FF4C60] text-[#FF4C60] bg-[#FF4C60]/10 hover:bg-[#FF4C60] hover:text-[#FFFACD] transition-all duration-300 hover:scale-105"
         >
           View Demo
         </Link>
