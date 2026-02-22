@@ -76,12 +76,17 @@ function syntaxHighlight(code: string, language: string): React.ReactNode[] {
     ));
   }
 
-  // Simple JSX/JS highlighter
   const lines = code.split("\n");
   return lines.map((line, i) => {
-    const highlighted = line
+    // Encode special chars first so &lt; targets work for JSX tag matching
+    const escaped = line
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;");
+
+    const highlighted = escaped
       // Comments
-      .replace(/(\/\/.*)/g, '<span class="text-gray-500">$1</span>')
+      .replace(/(\/\/.*)/g, '<span style="color:#6b7280">$1</span>')
       // Strings
       .replace(/('([^']*)'|"([^"]*)")/g, '<span style="color:#FFFACD">$1</span>')
       // Keywords
@@ -89,8 +94,9 @@ function syntaxHighlight(code: string, language: string): React.ReactNode[] {
         /\b(import|export|default|from|const|let|var|return|function|async|await|if|else)\b/g,
         '<span style="color:#FF4C60">$1</span>'
       )
-      // JSX tags
-      .replace(/(&lt;\/?)([A-Z][a-zA-Z]*)/g, '$1<span style="color:#a78bfa">$2</span>')
+      // JSX Pascal-case component tags
+      .replace(/(&lt;\/?)(([A-Z][a-zA-Z]*))/g, '$1<span style="color:#a78bfa">$2</span>')
+      // JSX lowercase HTML tags
       .replace(/(&lt;\/?)(html|body|div|button|span|p|h1|h2)/g, '$1<span style="color:#60a5fa">$2</span>');
 
     return (
@@ -110,7 +116,6 @@ export default function Demo() {
   return (
     <section id="demo" className="relative py-24 px-6">
       <div className="max-w-5xl mx-auto">
-        {/* Section heading */}
         <div className="text-center mb-16">
           <h2
             className="text-6xl md:text-8xl font-bold uppercase tracking-[0.1em]"
@@ -143,7 +148,6 @@ export default function Demo() {
 
         {/* Code block */}
         <div className="rounded-b-2xl rounded-tr-2xl bg-[#0d0d16] border border-t-0 border-[#1e1e2e] overflow-hidden">
-          {/* Code header */}
           <div className="flex items-center gap-2 px-5 py-3 border-b border-[#1e1e2e]">
             <div className="w-3 h-3 rounded-full bg-[#FF4C60]" />
             <div className="w-3 h-3 rounded-full bg-yellow-500 opacity-60" />
@@ -166,20 +170,7 @@ export default function Demo() {
             href="https://github.com"
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 px-8 py-3 rounded-lg border-2 font-bold uppercase tracking-wider text-sm transition-all duration-300 hover:scale-105"
-            style={{
-              borderColor: "#FF4C60",
-              color: "#FF4C60",
-              background: "transparent",
-            }}
-            onMouseEnter={(e) => {
-              (e.currentTarget as HTMLAnchorElement).style.background = "#FF4C60";
-              (e.currentTarget as HTMLAnchorElement).style.color = "#FFFACD";
-            }}
-            onMouseLeave={(e) => {
-              (e.currentTarget as HTMLAnchorElement).style.background = "transparent";
-              (e.currentTarget as HTMLAnchorElement).style.color = "#FF4C60";
-            }}
+            className="inline-flex items-center gap-2 px-8 py-3 rounded-lg border-2 border-[#FF4C60] text-[#FF4C60] bg-transparent hover:bg-[#FF4C60] hover:text-[#FFFACD] font-bold uppercase tracking-wider text-sm transition-all duration-300 hover:scale-105"
           >
             <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
               <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z" />
@@ -190,7 +181,7 @@ export default function Demo() {
             href="#"
             className="inline-flex items-center gap-2 px-8 py-3 rounded-lg border-2 border-[#1e1e2e] font-bold uppercase tracking-wider text-sm text-gray-400 hover:text-[#FFFACD] hover:border-[#FFFACD] transition-all duration-300"
           >
-            View Docs →
+            View Docs
           </a>
         </div>
       </div>
