@@ -1,6 +1,4 @@
 /** @type {import('tailwindcss').Config} */
-import { withUt } from "uploadthing/tw";
-
 module.exports = {
   content: [
     "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
@@ -12,6 +10,10 @@ module.exports = {
       fontFamily: {
         sans: ["var(--font-inter)", "Arial", "Helvetica", "sans-serif"],
         "abc-favorit": ["var(--font-abc-favorit)", "Arial", "Helvetica", "sans-serif"],
+      },
+      colors: {
+        accent: "#FF4C60",
+        cream: "#FFFACD",
       },
     },
   },
