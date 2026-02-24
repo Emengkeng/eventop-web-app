@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Logo from "./Logo";
 
 export default function Hero() {
   return (
@@ -22,48 +23,10 @@ export default function Hero() {
         }}
       />
 
-      {/* Mascot placeholder */}
       <div
-        className="relative mb-8 animate-fade-in"
-        style={{ animationFillMode: "both" }}
+        className="p-10 flex items-center"
       >
-        <div className="w-28 h-28 rounded-full bg-[#12121a] border-2 border-[#FF4C60] flex items-center justify-center glow">
-          <svg 
-            width="512" 
-            height="320" 
-            viewBox="0 0 512 320" 
-            xmlns="http://www.w3.org/2000/svg">
-            <defs>
-              <style>
-                .outline { stroke: #FF4C60; stroke-width: 10; fill: #FFFACD; }
-                .line { stroke: #FF4C60; stroke-width: 10; stroke-linecap: round; fill: none; }
-                .fill { fill: #FF4C60; }
-              </style>
-            </defs>
-
-            {/* <!-- Head shape --> */}
-            <path class="outline"
-                  d="M96 160
-                    C96 70, 180 40, 256 70
-                    C332 40, 416 70, 416 160
-                    C416 250, 332 280, 256 250
-                    C180 280, 96 250, 96 160 Z"/>
-
-            {/* <!-- Center split --> */}
-            <line class="line" x1="256" y1="70" x2="256" y2="210"/>
-
-            {/* <!-- Eyes --> */}
-            <ellipse class="fill" cx="205" cy="150" rx="10" ry="14"/>
-            <ellipse class="fill" cx="307" cy="150" rx="10" ry="14"/>
-
-            {/* <!-- Smile --> */}
-            <path class="fill"
-                  d="M170 190
-                    Q256 250 342 190
-                    Q342 210 256 270
-                    Q170 210 170 190 Z"/>
-          </svg>
-        </div>
+        <Logo className="w-48 h-auto" />
       </div>
 
       {/* Title */}
