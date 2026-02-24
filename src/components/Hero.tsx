@@ -28,24 +28,40 @@ export default function Hero() {
         style={{ animationFillMode: "both" }}
       >
         <div className="w-28 h-28 rounded-full bg-[#12121a] border-2 border-[#FF4C60] flex items-center justify-center glow">
-          <svg
-            width="56"
-            height="56"
-            viewBox="0 0 64 64"
-            fill="none"
-          >
-            {/* Robot / mascot face */}
-            <rect x="12" y="16" width="40" height="32" rx="8" fill="#1e1e2e" stroke="#FF4C60" strokeWidth="2" />
-            <circle cx="23" cy="30" r="5" fill="#FF4C60" />
-            <circle cx="41" cy="30" r="5" fill="#FF4C60" />
-            <circle cx="24" cy="29" r="2" fill="#FFFACD" />
-            <circle cx="42" cy="29" r="2" fill="#FFFACD" />
-            <path d="M24 40 Q32 46 40 40" stroke="#FFFACD" strokeWidth="2" strokeLinecap="round" fill="none" />
-            <rect x="28" y="8" width="8" height="8" rx="2" fill="#FF4C60" />
-            <line x1="32" y1="8" x2="32" y2="16" stroke="#FF4C60" strokeWidth="2" />
-            {/* Ears */}
-            <rect x="4" y="24" width="8" height="12" rx="4" fill="#1e1e2e" stroke="#FF4C60" strokeWidth="2" />
-            <rect x="52" y="24" width="8" height="12" rx="4" fill="#1e1e2e" stroke="#FF4C60" strokeWidth="2" />
+          <svg 
+            width="512" 
+            height="320" 
+            viewBox="0 0 512 320" 
+            xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <style>
+                .outline { stroke: #FF4C60; stroke-width: 10; fill: #FFFACD; }
+                .line { stroke: #FF4C60; stroke-width: 10; stroke-linecap: round; fill: none; }
+                .fill { fill: #FF4C60; }
+              </style>
+            </defs>
+
+            {/* <!-- Head shape --> */}
+            <path class="outline"
+                  d="M96 160
+                    C96 70, 180 40, 256 70
+                    C332 40, 416 70, 416 160
+                    C416 250, 332 280, 256 250
+                    C180 280, 96 250, 96 160 Z"/>
+
+            {/* <!-- Center split --> */}
+            <line class="line" x1="256" y1="70" x2="256" y2="210"/>
+
+            {/* <!-- Eyes --> */}
+            <ellipse class="fill" cx="205" cy="150" rx="10" ry="14"/>
+            <ellipse class="fill" cx="307" cy="150" rx="10" ry="14"/>
+
+            {/* <!-- Smile --> */}
+            <path class="fill"
+                  d="M170 190
+                    Q256 250 342 190
+                    Q342 210 256 270
+                    Q170 210 170 190 Z"/>
           </svg>
         </div>
       </div>
