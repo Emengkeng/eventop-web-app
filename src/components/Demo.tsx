@@ -178,7 +178,7 @@ export default function Demo() {
             1 ★ on GitHub
           </a>
           <a
-            href="#"
+            href="https://docs.eventop.xyz/introduction"
             className="inline-flex items-center gap-2 px-8 py-3 rounded-lg border-2 border-[#1e1e2e] font-bold uppercase tracking-wider text-sm text-gray-400 hover:text-[#FFFACD] hover:border-[#FFFACD] transition-all duration-300"
           >
             View Docs

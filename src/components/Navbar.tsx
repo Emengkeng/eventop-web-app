@@ -92,7 +92,7 @@ export default function Navbar() {
       {/* Mobile menu */}
       {mobileOpen && (
         <div className="md:hidden border-t border-[#1e1e2e] bg-[#0a0a0f] px-6 py-4 flex flex-col gap-4">
-          {["GitHub", "Docs", "Demo", "Pricing", "Discord", "Contact"].map((item) => (
+          {["GitHub", "Docs", "Demo", "Contact"].map((item) => (
             <Link
               key={item}
               href="#"
